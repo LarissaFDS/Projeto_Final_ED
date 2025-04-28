@@ -1,78 +1,101 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
+#include <locale.h>
 
 #define MAX_ESTADOS 100
 
-typedef struct {
-    char nome[50];
-} Estado;
+typedef struct{
+    char nome[50];  //representa um estado com um nome
+}Estado;
 
-typedef struct {
-    Estado estados[MAX_ESTADOS];
-    int topo;
-} PilhaEstados;
+typedef struct{
+    Estado estados[MAX_ESTADOS]; //array de estado
+    int topo; //indice pra saber o topo
+}PilhaEstados;
 
 // Funções da pilha
-void inicializar(PilhaEstados *pilha) {
-    pilha->topo = -1;
+void inicializar(PilhaEstados *pilha){
+    pilha -> topo = -1;
 }
 
-int estaVazia(PilhaEstados *pilha) {
-    return pilha->topo == -1;
+int vazia(PilhaEstados *pilha){
+    return pilha -> topo == -1; //se tiver vazia retorna 1
 }
 
-int estaCheia(PilhaEstados *pilha) {
-    return pilha->topo == MAX_ESTADOS - 1;
+int cheia(PilhaEstados *pilha){
+    return pilha -> topo == MAX_ESTADOS - 1; //se tiver cheia retorna 1
 }
 
-void empilhar(PilhaEstados *pilha, const char *nomeEstado) {
-    if (estaCheia(pilha)) {
-        printf("Erro: pilha cheia!\n");
+void empilhar(PilhaEstados *pilha, const char *nomeEstado){
+    if(cheia(pilha)){
+        printf("\n\tErro: pilha cheia!\n");
         return;
     }
-    pilha->topo++;
-    strcpy(pilha->estados[pilha->topo].nome, nomeEstado);
-    printf("Entrou no estado: %s\n", nomeEstado);
+    pilha -> topo++; //avança o topo pro proximo indice
+    strcpy(pilha -> estados[pilha -> topo].nome, nomeEstado); //copia o nome do novo estado pro topo
+    printf("\n\tEntrou no estado: %s\n", nomeEstado);
 }
 
-void desempilhar(PilhaEstados *pilha) {
-    if (estaVazia(pilha)) {
-        printf("Erro: pilha vazia!\n");
+void desempilhar(PilhaEstados *pilha){
+    if(vazia(pilha)){
+        printf("\n\tErro: pilha vazia!\n");
         return;
     }
-    printf("Saindo do estado: %s\n", pilha->estados[pilha->topo].nome);
-    pilha->topo--;
+    printf("\n\tSaindo do estado: %s", pilha -> estados[pilha -> topo].nome); //mostra o estado que vai ser removido
+    pilha -> topo--; //decrementa o topo pra fazer a remoção lógica
 }
 
-void estadoAtual(PilhaEstados *pilha) {
-    if (estaVazia(pilha)) {
-        printf("Sem estado atual\n");
+void estadoAtual(PilhaEstados *pilha){
+    if(vazia(pilha)){
+        printf("Jogando\n"); //estado inicial
         return;
     }
-    printf("Estado atual: %s\n", pilha->estados[pilha->topo].nome);
+    printf("\n\tEstado atual: %s\n", pilha -> estados[pilha -> topo].nome);
 }
 
-// Simulação de jogo
-int main() {
+int main(){
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+    SetConsoleOutputCP(65001);
+
     PilhaEstados jogo;
     inicializar(&jogo);
 
-    empilhar(&jogo, "JOGANDO");
-    estadoAtual(&jogo);
+    int opcao;
+    char nomeEstado[50];
 
-    empilhar(&jogo, "MENU DE PAUSA");
-    estadoAtual(&jogo);
+    do{
+        printf("\nEscolha uma opção:\n");
+        printf("1 - Empilhar novo estado\n");
+        printf("2 - Desempilhar estado atual\n");
+        printf("0 - Sair\n");
+        printf("Opção: ");
+        scanf("%d", &opcao);
+        getchar(); // Consumir o '\n' deixado pelo scanf
 
-    empilhar(&jogo, "CONFIGURACOES");
-    estadoAtual(&jogo);
+        switch(opcao){
+            case 1:
+                printf("Digite o nome do novo estado: ");
+                fgets(nomeEstado, sizeof(nomeEstado), stdin);
+                nomeEstado[strcspn(nomeEstado, "\n")] = 0; // Remover o \n do final
 
-    // Agora o jogador aperta "voltar" duas vezes
-    desempilhar(&jogo); // volta para MENU DE PAUSA
-    estadoAtual(&jogo);
+                empilhar(&jogo, nomeEstado);
+                estadoAtual(&jogo);
+                break;
+            case 2:
+                desempilhar(&jogo);
+                estadoAtual(&jogo);
+                break;
+            case 0:
+                printf("Encerrando programa.\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+                break;
+        }
 
-    desempilhar(&jogo); // volta para JOGANDO
-    estadoAtual(&jogo);
+    }while(opcao != 0);
 
     return 0;
 }
