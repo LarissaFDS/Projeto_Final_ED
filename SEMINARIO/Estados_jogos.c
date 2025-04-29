@@ -49,7 +49,7 @@ void desempilhar(PilhaEstados *pilha){
 
 void estadoAtual(PilhaEstados *pilha){
     if(vazia(pilha)){
-        printf("Jogando\n"); //estado inicial
+        printf("\n\tJogando\n"); //estado inicial
         return;
     }
     printf("\n\tEstado atual: %s\n", pilha -> estados[pilha -> topo].nome);
